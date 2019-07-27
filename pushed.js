@@ -4,13 +4,6 @@ module.exports = function(RED) {
 
     var PUSHED_URL = "https://api.pushed.co/1/push"
     var PUSHED_TARGET_TYPE = "app"
-	var STRICT_SSL = true;
-    var REQUEST_TIMEOUT = 5000;
-    
-    var isObject = function(a) {
-        if ((typeof(a) === "object") && (!Buffer.isBuffer(a)) && (!Array.isArray(a))) { return true; }
-        else { return false; }
-    };
 
     function PushedNode(config) {
         RED.nodes.createNode(this, config);
@@ -21,34 +14,25 @@ module.exports = function(RED) {
         var node = this;
 
         node.on('input', function(msg) {
-            if (!isObject(msg.payload)) {
-                msg.payload = {payload: msg.payload};
-            }
-
-            data = {
-                app_key: this.app_key,
-                app_secret: this.app_secret,
-                target_type: PUSHED_TARGET_TYPE,
-                content: msg.payload
+            const data = {
+                'app_key': this.app_key,
+                'app_secret': this.app_secret,
+                'target_type': PUSHED_TARGET_TYPE,
+                'content': msg.payload
             };
 
-            request({
+            request.post({
                 url: PUSHED_URL,
-                method: "POST",
-                followAllRedirects: true,
-                timeout: REQUEST_TIMEOUT,
-                strictSSL: STRICT_SSL,
-                json: data
+                form: data,
+                json: true
             }, function (error, response, body) {
-                var responseData = JSON.parse(body);
-
                 if (response.statusCode == 200) {
-                    this.status({fill: "green", shape: "dot", text: responseData.response.message});
-                    this.log(responseData);
+                    node.status({fill: "green", shape: "dot", text: body.response.message});
                 } else {
-                    this.status({fill: "red", shape: "ring", text: responseData.error.message});
-                    this.warn(responseData);
+                    node.status({fill: "red", shape: "ring", text: body.error.message});
                 }
+                msg.payload = body;
+                node.send(msg);
             });
         });
     }

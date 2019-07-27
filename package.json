@@ -1,0 +1,23 @@
+{
+  "name": "node-red-contrib-pushed",
+  "version": "0.2.0",
+  "description": "Node to deliver notifications to Pushed.co",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/sircuri/node-red-contrib-pushed.git"
+	},
+  "keywords": [
+    "node-red",
+    "pushed"
+  ],
+  "author": "Sircuri",
+  "license": "ISC",
+  "node-red" : {
+    "nodes": {
+        "pushed": "pushed.js"
+    }
+  }
+}
